@@ -239,7 +239,7 @@
               (")" . evil-previous-close-paren))
 
   ;; use \j\j to escape 
-  (define-key evil-insert-state-map "jj" 'evil-normal-state)
+  ; (define-key evil-insert-state-map "jj" 'evil-normal-state)
   
   :init
   (setq evil-want-integration t)
@@ -264,7 +264,25 @@
   (evil-collection-init))
 
 (evil-commentary-mode)
-(evil-surround-mode)
+(use-package evil-surround-mode
+  :ensure t
+  :config (global-evil-surround-mode t))
+
+;; Define a function to exit insert mode when "jj" is typed
+; (defun my-exit-insert-mode ()
+;   (interactive)
+;   (let ((inhibit-quit t))
+;     (if (and (string= (this-command-keys) "jj")
+;              (evil-insert-state-p))
+;         (progn
+;           (delete-char -1)
+;           (evil-normal-state))
+;       (setq unread-command-events (listify-key-sequence (this-command-keys))))))
+;
+; ;; Bind the function to the "jj" key sequence
+; (define-key evil-insert-state-map "j" #'my-exit-insert-mode)
+; (define-key evil-insert-state-map "jj" #'my-exit-insert-mode)
+
 
 ;; An extremely feature-rich git client. Activate it with "C-c g".
 (use-package magit
@@ -315,12 +333,6 @@
 (put 'dired-find-alternate-file 'disabled nil)
 
 
-;; skewer-mode and js2-mode-hook
-(add-hook 'js2-mode-hook 'skewer-mode)
-(add-hook 'css-mode-hook 'skewer-css-mode)
-(add-hook 'html-mode-hook 'skewer-html-mode)
-
-
 (use-package vterm
   :ensure t
   :bind (("C-x v t" . vterm)
@@ -335,3 +347,53 @@
 ;; Get environment variables such as $PATH from the shell
 (require 'exec-path-from-shell) ;; if not using the ELPA package
     (exec-path-from-shell-initialize)
+
+
+;; javascript ===================
+
+(add-to-list 'auto-mode-alist '("\\.js\\'" . js2-mode))
+(add-to-list 'auto-mode-alist '("\\.mjs\\'" . js2-mode))
+
+(add-hook 'js2-mode-hook 'prettier-mode)
+
+(use-package skewer
+  :bind (:map skewer-mode
+              ("C-c C-c" . skewer-load-buffer)))
+
+;; skewer-mode and js2-mode-hook
+(add-hook 'js2-mode-hook 'skewer-mode)
+(add-hook 'css-mode-hook 'skewer-css-mode)
+(add-hook 'html-mode-hook 'skewer-html-mode)
+
+;; javascript end ===================
+
+
+
+
+;; python staff ===================
+
+;; Use pyvenv to activate the virtual environment
+(require 'pyvenv)
+(pyvenv-activate "~/jupyter")
+
+
+;; ;; devdocs
+;; (use-package devdocs
+;;   :bind ("C-h D" 'devdocs-lookup) 
+;;   )
+;; (global-set-key (kbd "C-h D") 'devdocs-lookup)
+
+;; ruff format
+(add-hook 'python-mode-hook 'ruff-format-on-save-mode)
+(add-hook 'elpy-mode-hook 'ruff-format-on-save-mode)
+
+;; (use-package python-pytest)
+
+(use-package elpy
+  :ensure t
+  :init
+  (elpy-enable))
+
+;; end python staff ===================
+
+
