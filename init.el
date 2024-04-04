@@ -23,7 +23,7 @@
 
 ;; work around for emac 28
 ;; https://emacs.stackexchange.com/questions/69066/problem-loading-packages-with-emacs-28
-; (setq find-file-visit-truename nil)
+                                        ; (setq find-file-visit-truename nil)
 
 
 
@@ -111,14 +111,14 @@
 (unless (package-installed-p 'use-package)
   (package-install 'use-package))
 
-;
+                                        ;
 (require 'use-package)
 
 ;; Add the :vc keyword to use-package, making it easy to install
 ;; packages directly from git repositories.
-; (unless (package-installed-p 'vc-use-package)
-;   (package-vc-install "https://github.com/slotThe/vc-use-package"))
-; (require 'vc-use-package)
+                                        ; (unless (package-installed-p 'vc-use-package)
+                                        ;   (package-vc-install "https://github.com/slotThe/vc-use-package"))
+                                        ; (require 'vc-use-package)
 
 ;; A quick primer on the `use-package' function (refer to
 ;; "C-h f use-package" for the full details).
@@ -196,10 +196,10 @@
 ;; Adds LSP support. Note that you must have the respective LSP
 ;; server installed on your machine to use it with Eglot. e.g.
 ;; rust-analyzer to use Eglot with `rust-mode'.
-; (use-package eglot
-;   :ensure t
-;   :bind (("s-<mouse-1>" . eglot-find-implementation)
-;          ("C-c ." . eglot-code-action-quickfix)))
+                                        ; (use-package eglot
+                                        ;   :ensure t
+                                        ;   :bind (("s-<mouse-1>" . eglot-find-implementation)
+                                        ;          ("C-c ." . eglot-code-action-quickfix)))
 
 ;; Add extra context to Emacs documentation to help make it easier to
 ;; search and understand. This configuration uses the keybindings 
@@ -217,7 +217,8 @@
 ;; An extremely feature-rich git client. Activate it with "C-c g".
 (use-package magit
   :ensure t
-  :bind (("C-c g" . magit-status)))
+  ;; :bind (("C-c g" . magit-status))
+  )
 
 
 ;; Key and chords ================
@@ -229,17 +230,17 @@
   :init
   (global-undo-tree-mode 1))
 
-(defun dw/evil-hook ()
-  (dolist (mode '(custom-mode
-                  eshell-mode
-                  git-rebase-mode
-                  erc-mode
-                  circe-server-mode
-                  circe-chat-mode
-                  circe-query-mode
-                  sauron-mode
-                  term-mode))
-  (add-to-list 'evil-emacs-state-modes mode)))
+;; (defun dw/evil-hook ()
+;;   (dolist (mode '(custom-mode
+;;                   eshell-mode
+;;                   git-rebase-mode
+;;                   erc-mode
+;;                   circe-server-mode
+;;                   circe-chat-mode
+;;                   circe-query-mode
+;;                   sauron-mode
+;;                   term-mode))
+;;   (add-to-list 'evil-emacs-state-modes mode)))
 
 
 ;; Adds vim emulation. Activate `evil-mode' to swap your default Emacs
@@ -247,30 +248,32 @@
 ;; keybindings that Evil needs to modify, so this configuration also
 ;; includes `evil-collection' to fill in the gaps.
 (use-package evil
-    :ensure t
+  :ensure t
 
-    :init
-    (setq evil-want-integration t)
-    (setq evil-want-keybinding nil)
-    (setq evil-undo-system 'undo-tree)
+  :init
+  (setq evil-want-integration t)
+  (setq evil-want-keybinding nil)
+  (setq evil-undo-system 'undo-tree)
 
-    (setq evil-respect-visual-line-mode t)
-    (setq evil-want-Y-yank-to-eol t)
-    (setq evil-split-window-below t)
-    (setq evil-split-window-right t)
+  (setq evil-respect-visual-line-mode t)
+  (setq evil-want-Y-yank-to-eol t)
+  (setq evil-split-window-below t)
+  (setq evil-split-window-right t)
 
-    :config
-    ;; (add-hook 'evil-mode-hook 'dw/evil-hook)
-    (evil-mode 1)
-    (evil-set-leader 'normal " ")
+  :config
+  ;; (add-hook 'evil-mode-hook 'dw/evil-hook)
+  (evil-mode 1)
+  (evil-set-leader 'normal " ")
 
-    ;; Use visual line motions even outside of visual-line-mode buffers
-    ;; (evil-global-set-key 'motion "j" 'evil-next-visual-line)
-    ;; (evil-global-set-key 'motion "k" 'evil-previous-visual-line)
+  ;; no vim insert bindings
+  ;; (setq evil-disable-insert-state-bindings t)
+
+
+  ;; Use visual line motions even outside of visual-line-mode buffers
+  ;; (evil-global-set-key 'motion "j" 'evil-next-visual-line)
+  ;; (evil-global-set-key 'motion "k" 'evil-previous-visual-line)
 
   :bind (:map evil-normal-state-map
-              ;; ("-"  . (lambda () (interactive)
-              ;;           (dired ".")))
               ;; ("C-s" . consult-line)
               ;; Better lisp bindings
               ("(" . evil-previous-open-paren)
@@ -291,18 +294,16 @@
   )
 
 (use-package evil-collection
-  :after evi
+  :after evil
   :ensure t
   :config
   (evil-collection-init))
 
 (evil-commentary-mode)
 (evil-surround-mode)
-(setq global-evil-surround-mode t)
+
 
 ;; Key and chords end ================
-
-
 
 ;; In addition to installing packages from the configured package
 ;; registries, you can also install straight from version control
@@ -315,9 +316,9 @@
 ;;
 ;; Read more about projects here:
 ;; https://www.gnu.org/software/emacs/manual/html_node/emacs/Projects.html
-; (use-package breadcrumb
-;   :vc (:fetcher github :repo joaotavora/breadcrumb)
-;   :init (breadcrumb-mode))
+                                        ; (use-package breadcrumb
+                                        ;   :vc (:fetcher github :repo joaotavora/breadcrumb)
+                                        ;   :init (breadcrumb-mode))
 
 ;; As you've probably noticed, Lisp has a lot of parentheses.
 ;; Maintaining the syntactical correctness of these parentheses
@@ -341,7 +342,7 @@
          (scheme-mode . enable-paredit-mode)
          (racket-mode . enable-paredit-mode)
          ))
- 
+
 ;; for sly
 (setq inferior-lisp-program "ros run")
 ;; (setq inferior-lisp-program "sbcl")
@@ -364,7 +365,7 @@
 
 ;; Get environment variables such as $PATH from the shell
 (require 'exec-path-from-shell) ;; if not using the ELPA package
-    (exec-path-from-shell-initialize)
+(exec-path-from-shell-initialize)
 
 
 
