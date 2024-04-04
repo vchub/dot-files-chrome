@@ -108,9 +108,7 @@
 (unless package-archive-contents
   (package-refresh-contents))
 
-
 (unless (package-installed-p 'use-package)
-  (package-refresh-contents)
   (package-install 'use-package))
 
 ;
@@ -215,18 +213,64 @@
          ("C-h F" . #'helpful-function)
          ("C-h C" . #'helpful-command)))
 
+
+;; An extremely feature-rich git client. Activate it with "C-c g".
+(use-package magit
+  :ensure t
+  :bind (("C-c g" . magit-status)))
+
+
+;; Key and chords ================
+
+;; ESC Cancels All
+(global-set-key (kbd "<escape>") 'keyboard-escape-quit)
+
+(use-package undo-tree
+  :init
+  (global-undo-tree-mode 1))
+
+(defun dw/evil-hook ()
+  (dolist (mode '(custom-mode
+                  eshell-mode
+                  git-rebase-mode
+                  erc-mode
+                  circe-server-mode
+                  circe-chat-mode
+                  circe-query-mode
+                  sauron-mode
+                  term-mode))
+  (add-to-list 'evil-emacs-state-modes mode)))
+
+
 ;; Adds vim emulation. Activate `evil-mode' to swap your default Emacs
 ;; keybindings with the modal editor of great infamy. There's a ton of
 ;; keybindings that Evil needs to modify, so this configuration also
 ;; includes `evil-collection' to fill in the gaps.
 (use-package evil
-  :ensure t
+    :ensure t
 
-  
+    :init
+    (setq evil-want-integration t)
+    (setq evil-want-keybinding nil)
+    (setq evil-undo-system 'undo-tree)
+
+    (setq evil-respect-visual-line-mode t)
+    (setq evil-want-Y-yank-to-eol t)
+    (setq evil-split-window-below t)
+    (setq evil-split-window-right t)
+
+    :config
+    ;; (add-hook 'evil-mode-hook 'dw/evil-hook)
+    (evil-mode 1)
+    (evil-set-leader 'normal " ")
+
+    ;; Use visual line motions even outside of visual-line-mode buffers
+    ;; (evil-global-set-key 'motion "j" 'evil-next-visual-line)
+    ;; (evil-global-set-key 'motion "k" 'evil-previous-visual-line)
+
   :bind (:map evil-normal-state-map
-              ;; vim vinigar style
-              ("-"  . (lambda () (interactive)
-                        (dired ".")))
+              ;; ("-"  . (lambda () (interactive)
+              ;;           (dired ".")))
               ;; ("C-s" . consult-line)
               ;; Better lisp bindings
               ("(" . evil-previous-open-paren)
@@ -236,58 +280,29 @@
               ;; ("C-p" . evil-previous-line)
               :map evil-operator-state-map
               ("(" . evil-previous-open-paren)
-              (")" . evil-previous-close-paren))
+              (")" . evil-previous-close-paren)
+              :map evil-insert-state-map
+              ("C-g" . evil-normal-state)
+              ("C-h" . evil-delete-backward-char-and-join)
+              ("C-d" . evil-delete-char)
 
-  ;; use \j\j to escape 
-  ; (define-key evil-insert-state-map "jj" 'evil-normal-state)
+              )
   
-  :init
-  (setq evil-want-integration t)
-  (setq evil-want-keybinding nil)
-
-  ;; no vim insert bindings
-  ;; (setq evil-disable-insert-state-bindings t)
-  (setq evil-want-Y-yank-to-eol t)
-  (setq evil-split-window-below t)
-  (setq evil-undo-system 'undo-redo)
-  (setq evil-split-window-right t)
-
-  :config
-  (evil-set-leader 'normal " ")
-  (evil-mode 1)
   )
 
 (use-package evil-collection
-  :after evil
+  :after evi
   :ensure t
   :config
   (evil-collection-init))
 
 (evil-commentary-mode)
-(use-package evil-surround-mode
-  :ensure t
-  :config (global-evil-surround-mode t))
+(evil-surround-mode)
+(setq global-evil-surround-mode t)
 
-;; Define a function to exit insert mode when "jj" is typed
-; (defun my-exit-insert-mode ()
-;   (interactive)
-;   (let ((inhibit-quit t))
-;     (if (and (string= (this-command-keys) "jj")
-;              (evil-insert-state-p))
-;         (progn
-;           (delete-char -1)
-;           (evil-normal-state))
-;       (setq unread-command-events (listify-key-sequence (this-command-keys))))))
-;
-; ;; Bind the function to the "jj" key sequence
-; (define-key evil-insert-state-map "j" #'my-exit-insert-mode)
-; (define-key evil-insert-state-map "jj" #'my-exit-insert-mode)
+;; Key and chords end ================
 
 
-;; An extremely feature-rich git client. Activate it with "C-c g".
-(use-package magit
-  :ensure t
-  :bind (("C-c g" . magit-status)))
 
 ;; In addition to installing packages from the configured package
 ;; registries, you can also install straight from version control
@@ -333,6 +348,7 @@
 (put 'dired-find-alternate-file 'disabled nil)
 
 
+;; terminal =============================
 (use-package vterm
   :ensure t
   :bind (("C-x v t" . vterm)
@@ -344,17 +360,82 @@
   :custom (vterm-max-scrollback 10000)
   )
 
+;; terminal end =============================
+
 ;; Get environment variables such as $PATH from the shell
 (require 'exec-path-from-shell) ;; if not using the ELPA package
     (exec-path-from-shell-initialize)
 
 
+
+;; Keybinding Panel (which-key) ==============
+;; which-key is great for getting an overview of what keybindings are available based on the prefix keys you entered. Learned about this one from Spacemacs.
+
+(use-package which-key
+  :init (which-key-mode)
+  :diminish which-key-mode
+  :config
+  (setq which-key-idle-delay 0.3))
+
+;; Keybinding Panel end ==============
+
+
+;; Projectile =====================
+;; Initial Setup
+
+;; (defun dw/switch-project-action ()
+;;   "Switch to a workspace with the project name and start `magit-status'."
+;;   (persp-switch (projectile-project-name))
+;;   (magit-status))
+
+
+;; (use-package projectile
+;;   :diminish projectile-mode
+;;   :config (projectile-mode)
+;;   :demand t
+;;   ;; :bind ("C-M-p" . projectile-find-file)
+;;   :bind-keymap
+;;   ("C-c p" . projectile-command-map)
+;;   :init
+;;   (when (file-directory-p "~/code")
+;;     (setq projectile-project-search-path '("~/code")))
+;;   ;; (setq projectile-switch-project-action #'dw/switch-project-action)
+;;   )
+
+;; (use-package counsel-projectile
+;;   :disabled
+;;   :after projectile
+;;   :config
+;;   (counsel-projectile-mode))
+
+;; (dw/leader-key-def
+;;   "pf"  'projectile-find-file
+;;   "ps"  'projectile-switch-project
+;;   "pF"  'consult-ripgrep
+;;   "pp"  'projectile-find-file
+;;   "pc"  'projectile-compile-project
+;;   "pd"  'projectile-dired)
+
+;; Adding Custom Project Types
+;; If a project you are working on is recognized incorrectly or you want to add your own type of projects you can add following to your Emacs initialization code
+;; (projectile-register-project-type 'npm '("package.json")
+;;                                   :project-file "package.json"
+;; 				  :compile "npm install"
+;; 				  :test "npm test"
+;; 				  :run "npm start"
+;; 				  :test-suffix ".spec")
+
+;; Projectile end =====================
+
 ;; javascript ===================
+(use-package js2-mode)
 
 (add-to-list 'auto-mode-alist '("\\.js\\'" . js2-mode))
 (add-to-list 'auto-mode-alist '("\\.mjs\\'" . js2-mode))
 
 (add-hook 'js2-mode-hook 'prettier-mode)
+
+;; (add-hook 'js2-mode-hook 'js2-mode-)
 
 (use-package skewer
   :bind (:map skewer-mode
@@ -383,17 +464,24 @@
 ;;   )
 ;; (global-set-key (kbd "C-h D") 'devdocs-lookup)
 
-;; ruff format
-(add-hook 'python-mode-hook 'ruff-format-on-save-mode)
-(add-hook 'elpy-mode-hook 'ruff-format-on-save-mode)
-
-;; (use-package python-pytest)
 
 (use-package elpy
   :ensure t
   :init
   (elpy-enable))
 
+
+;; ruff format
+(add-hook 'python-mode-hook 'ruff-format-on-save-mode)
+(add-hook 'elpy-mode-hook 'ruff-format-on-save-mode)
+
+
 ;; end python staff ===================
 
+;; Browser inter-ops =================
 
+;; The input on Emacs is reflected to the browser instantly and continuously.
+;; You can use both the browser and Emacs at the same time. They are updated to the same content bi-directionally.
+;; (require 'atomic-chrome)
+;; (atomic-chrome-start-server)
+;; Browser inter ops end =================
