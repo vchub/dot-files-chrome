@@ -251,9 +251,6 @@
 ;; keybindings that Evil needs to modify, so this configuration also
 ;; includes `evil-collection' to fill in the gaps.
 
-;; no vim insert bindings
-(setq evil-disable-insert-state-bindings t)
-
 (use-package evil
   :ensure t
 
@@ -261,6 +258,9 @@
   (setq evil-want-integration t)
   (setq evil-want-keybinding nil)
   (setq evil-undo-system 'undo-tree)
+
+  ;; no vim insert bindings
+  (setq evil-disable-insert-state-bindings t)
 
   (setq evil-respect-visual-line-mode t)
   (setq evil-want-Y-yank-to-eol t)
@@ -485,8 +485,8 @@
 
 ;; Browser inter-ops =================
 
-;; The input on Emacs is reflected to the browser instantly and continuously.
+;; GhostText makes the input on Emacs is reflected to the browser instantly and continuously.
 ;; You can use both the browser and Emacs at the same time. They are updated to the same content bi-directionally.
-;; (require 'atomic-chrome)
+(require 'atomic-chrome)
 ;; (atomic-chrome-start-server)
 ;; Browser inter ops end =================

@@ -19,3 +19,5 @@
 # temp emacs files
 **\#
 *-
+/..gitignore.~undo-tree~
+/.init.el.~undo-tree~
