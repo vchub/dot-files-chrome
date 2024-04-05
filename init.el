@@ -226,6 +226,9 @@
 ;; ESC Cancels All
 (global-set-key (kbd "<escape>") 'keyboard-escape-quit)
 
+;; use ibuffer for buffer management
+(global-set-key (kbd "C-x C-b" ) 'ibuffer)
+
 (use-package undo-tree
   :init
   (global-undo-tree-mode 1))
@@ -247,6 +250,10 @@
 ;; keybindings with the modal editor of great infamy. There's a ton of
 ;; keybindings that Evil needs to modify, so this configuration also
 ;; includes `evil-collection' to fill in the gaps.
+
+;; no vim insert bindings
+(setq evil-disable-insert-state-bindings t)
+
 (use-package evil
   :ensure t
 
@@ -264,9 +271,6 @@
   ;; (add-hook 'evil-mode-hook 'dw/evil-hook)
   (evil-mode 1)
   (evil-set-leader 'normal " ")
-
-  ;; no vim insert bindings
-  ;; (setq evil-disable-insert-state-bindings t)
 
 
   ;; Use visual line motions even outside of visual-line-mode buffers
